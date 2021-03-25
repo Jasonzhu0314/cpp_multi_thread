@@ -2,54 +2,52 @@
 #include <thread>
 using namespace std;
 
-//创建线程的方式，创建thread对象时，传入可调用对象
-//1. 函数
-//2. 类的仿函数
-//3. 类的成员函数
-
-void PrintThread(int& num) {
-    for (int i = 0; i < 10; i++) {
-        cout << "PrintThread func: " << i << endl;
-    }
-    cout << "endl" << endl;
-    num = 100;
-    cout << &num << endl;
-    cout << this_thread::get_id()<< endl;
-
+void PrintThread() {
+    cout << "common function PrintThread "<< endl;
 }
 
 class SonThread {
-    void operator()() {
-        for (int i = 0; i < 10; i++) {
-            cout << "PrintThread func: " << i << endl;
-        }
-        cout << "endl" << endl;
+public:
+    SonThread() {
+        cout << "default constructor func" << endl;
     }
+    SonThread(const SonThread &s) {
+        cout << "copy constructor func" << endl;
+    }
+    void operator()() {
+        cout << "class functor thread "<< endl;
+    }
+    void PrintThread() {
+        i = 100;
+        cout << "class function thread" << endl;
+    }
+    int i;
 };
 
-
 int main() {
-    // 普通函数
-    int num = 10;
-    thread myobj(PrintThread, ref(num));
-    myobj.join();
-    //myobj.detach();
-    cout << "son thread detach" << endl;
-    cout << &num << endl;
-    //myobj.join();
-    if (myobj.joinable()) {
+    //创建线程的方式，创建thread对象
+    // 1. 普通函数
+    thread mythread1(PrintThread);
+
+    mythread1.join(); // 阻塞进程
+    // mythread1.detach(); // 子线程和主线程分离
+    if (mythread1.joinable()) { // 判断线程是否可以重新加入
         cout << "son thread rejoin" << endl;
-        myobj.join();
+        mythread1.join(); // detach和join不能一起使用
     }
     else {
-        cout << "son thread joinable" << endl;
+        cout << "son thread can not join" << endl;
     }
 
-//    SonThread t;
-//    thread myobj2(t);
-//    cout << "class son Thread begin" << endl;
-//    myobj2.join();
-//    cout << "main thread" << endl;
+    // 2. 类仿函数
+    SonThread t;
+    thread mythread2(t);
+    mythread2.join();
+    t.i = 10;
+    // 3. 类的成员函数
+    thread mythread3(&SonThread::PrintThread, &t);
+    mythread3.join();
+    cout << t.i << endl;
 
     return 0;
 }
