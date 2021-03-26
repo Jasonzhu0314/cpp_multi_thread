@@ -97,6 +97,30 @@ public:
 void change_obj(A &a) { a.m_int = 10; } 
 std::thread t(change_obj, std::ref(a)); // 子线程创建时不会调用拷贝构造函数，修改m_int，会影响主线程
 ```
+#### 锁与互斥量
+当两个线程都要访问进程同一内存时，需要进行加锁处理，防止出现不可预料的情况的发生
+mutex作为互斥量变量，在需要对内存访问的代码中进行加锁，防止其他线程再去访问同一线程
+```c++
+std::mutex mylock;
+// 需要进行加锁的代码
+mylock.lock();
+// do something
+mylock.unlock();
+```
+std::lock_guard() 可以不使用unlock(), 本质上是在他的构造函数中使用了lock()，析构函数中调用了unlock()。
+std::lock()可以对多个mutex互斥量进行加锁。
+
+```c++
+std::mutex mylock1, mylock2;
+std::lock(mylock1, mylock2);
+std::lock_guard<mutex> shared_guard1(mylock1, std::adopt_lock())
+std::lock_guard<mutex> shared_guard2(mylock2, std::adopt_lock())
+```
+#### 死锁
+当进程中有两个互斥量时，线程A对互斥量A加锁，线程B对互斥量B加锁，导致两个线程都不释放，进程卡死
+解决方案：
+    1. 当只有对互斥量A和B都能加锁时才执行代码，否则释放互斥量
+
 
 
 
