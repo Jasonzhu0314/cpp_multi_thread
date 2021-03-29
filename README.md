@@ -122,6 +122,40 @@ std::lock_guard<mutex> shared_guard2(mylock2, std::adopt_lock())
     1. 当只有对互斥量A和B都能加锁时才执行代码，否则释放互斥量
 
 
+#### unique_lock类模板
+将unique_lock对象mutex绑定在一起
+第二个参数：
+1. 没有参数，默认会继续加锁
+2. std::adopt_lock   // 前面执行了mutex.lock()
+3. std::try_to_lock    // 尝试进行加锁，可以调用son_guard.owns_lock()判断是否锁成功
+4. std::defer_lock    
+只是定义，但是没有执行任何操作，后续可以调用的成员函数进行手动加锁，手动解锁，当操作共享数据时加锁，不操作共享数据时解锁。程序局部返回时可以手动解锁，可以不手动解锁
+- try_lock()
+- lock()
+- unlock()
+- release() 返回它管理的mutex对象指针，并释放所有权，也就是说， 这个unique_lock和mutex不再有关系
+如果原来的mutex处于加锁状态，要进行接管
+std::mutex *ptr = son_guard.release()
+```c++
+{
+    std::unique_lock son_guard(mutex, std::defer_locK);
+    son_guard.lock(); // 手动加锁
+    // 操作共享数据
+    
+    son_guard.unlock();
+    // 不操作共享数据
+    son_gutard.lock()
+    // 操作共享数据
+    // 程序返回可以执行unlock(),也可以不执行
+}
+```
+
+#### 锁的粒度
+锁头锁住的代码的数量，锁住的代码更少，执行的速度越快，高级程序员
+
+
+std::chrono
+std::this_thread::sleep_for()
 
 
 #### 安装教程
