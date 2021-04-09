@@ -5,7 +5,7 @@
 std::mutex m;
 int g_count = 0;
 // std::atomic<T> 类模板
-std::atomic<int> g_atomic_count(1);
+std::atomic<int> g_atomic_count(0);
 
 void MyThread(){
     for (int i = 0; i < 10000000; i++) {
@@ -17,7 +17,7 @@ void MyThread(){
         //m.unlock();
 
         // 2. 使用原子操作
-        //g_atomic_count++;
+        g_atomic_count++;
     }
 }
 
@@ -29,7 +29,7 @@ int main() {
     my_thread1.join();
     my_thread2.join();
 
-    std::cout << g_count << std::endl;
-
+    std::cout << "no atomic operator result: "<< g_count << std::endl;
+    std::cout << "atomic operaotr result: " << g_atomic_count << std::endl;
     return 0;
 }
