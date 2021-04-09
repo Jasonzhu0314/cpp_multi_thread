@@ -47,6 +47,8 @@ std::future<int> std::async(Mythread);
 和thread的区别
 std::thread，当程序的线程过多时，资源紧张，可能导致线程创建失败，thread()时整个程序崩溃
 std::thread有可能计算机资源紧张，执行失败，而std::async(std::launch::async, methodName)强制创建一个线程
+
+但是async不加额外参数的调用，就不会创建新线程，在主线程中执行
 但是我们一般不叫std::async()创建线程，而是创建一个异步任务，有的时候async并不创建新的线程
 
 ## future

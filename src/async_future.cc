@@ -29,13 +29,35 @@ int main() {
 
 
     // 1. 单独创建一个线程
-    std::future<int> result = std::async(std::launch::async, MyThread);
+    //std::future<int> result = std::async(std::launch::async, MyThread);
     // 2. 不单独创建一个线程，当调用wait和get时，线程才开始执行，线程id是主线程id
     // std::future<int> result1 = std::async(std::launch::async | std::launch::deferred, MyThread);
+    std::future<int> result = std::async(std::launch::deferred, MyThread);
     std::cout << "start" << std::endl;
+    std::future_status status = result.wait_for(std::chrono::seconds(6));
+
+    switch (status) {
+        case std::future_status::ready: {
+            std::cout << "Ready..." << std::endl;
+            // 获取结果
+            int a = result.get();
+            std::cout << a << std::endl;
+            break;
+        }
+        case std::future_status::timeout:
+            std::cout << "timeout..." << std::endl;
+            break;
+        case std::future_status::deferred:
+            std::cout << "deferred..." << std::endl;
+            break;
+        default:
+            break;
+    }
     // do something
-    int a = result.get();
-    std::cout << a << std::endl;
+
+    std::thread t1(MyThread);
+
+
 
     return 0;
 }
